@@ -7,7 +7,7 @@ import pygame
 import pprint as pp
 
 WINDOW_SIZE = (600, 600)
-FIELD_SIZE = (10, 10)
+FIELD_SIZE = (30, 30)
 
 pygame.init()
 pygame.display.set_caption('Minesweeper')
@@ -56,21 +56,23 @@ class Grid:
             self.cells.append(row)
         
     def __place_bombs(self):
-        self.points = gen_random_points(5)
+        self.points = gen_random_points(25)
         print(self.points)
         for point in self.points:
             self.cells[point[0]][point[1]] = Cell(point[0], point[1], Cell.Role.Mine)
     def extend_open_area(self, x, y):
+        # print(f"Extending {x}, {y}")
         if (x,y) in self.extended_cells:
+            # print("Already extended, skipping..")
             return
+        self.extended_cells.add((x,y))
         for i in range(-1, 2):
             for j in range(-1, 2):
                 try:
                     self.open_cell(x+i, y+j)
                     #self.opened_cells.add((x+i,y+i))
                 except Exception as e:
-                    continue
-        self.extended_cells.add((x,y))
+                    break
     def draw(self, screen):
         pixel_side = WINDOW_SIZE[0]//FIELD_SIZE[0]
         screen.fill(self.bg_color)
@@ -83,7 +85,9 @@ class Grid:
     def open_cell(self, cell_x, cell_y):
         # print(cell_x, cell_y)
         self.cells[cell_x][cell_y].open()
-        if cell_x in range(1,30) and cell_y in range(1,30)  and self.cells[cell_x][cell_y].role == Cell.Role.Empty:
+        #self.draw(screen)
+        #pygame.display.flip()
+        if cell_x in range(1,FIELD_SIZE[0]) and cell_y in range(1,FIELD_SIZE[1])  and self.cells[cell_x][cell_y].role == Cell.Role.Empty:
             self.extend_open_area(cell_x, cell_y)
     def open(self):
         # for i in range(FIELD_SIZE[0]):
@@ -96,6 +100,16 @@ class Grid:
     def check_win(self):
         if self.flagged_cells == set(self.points):
             print("You won!")
+            win_screen()
+def win_screen():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+        msg_font = pygame.font.SysFont("Lucida Console", 24)
+        text = msg_font.render("Ура!", True, (0, 0, 0))
+        place = text.get_rect(center=(WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2))
+        screen.blit(text, place)
+        pygame.display.flip()
 
 class Cell:
     cell_side = WINDOW_SIZE[0]//FIELD_SIZE[0]
