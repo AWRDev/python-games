@@ -13,10 +13,10 @@ clock = pygame.time.Clock()
 
 class Snake:
     def __init__(self) -> None:
-        self.x = 10
-        self.y = 10
-        self.color = (1, 50, 32)
-        self.points = [(10,10)]
+        self.x = random.randint(10, 20)
+        self.y = random.randint(10, 20)
+        self.color = (1, 150, 32)
+        self.points = [(self.x,self.y)]
         self.direction = 'right'
     def make_step(self):
         match self.direction:
@@ -28,6 +28,8 @@ class Snake:
                 self.y -= 1
             case 'down':
                 self.y += 1
+        if self.x not in range(0, 32) or self.y not in range(0, 32):
+            exit()
         snake.points.append((self.x, self.y))
         snake.points.pop(0)
     def draw_point(self, screen, x ,y):
@@ -38,13 +40,17 @@ class Snake:
     def handle_input(self, input):
         match input:
             case pygame.K_w:
-                self.direction = 'up'
+                if self.direction != 'down':
+                    self.direction = 'up'
             case pygame.K_s:
-                self.direction = 'down'
+                if self.direction != 'up':
+                    self.direction = 'down'
             case pygame.K_a:
-                self.direction = 'left'
+                if self.direction != 'right':
+                    self.direction = 'left'
             case pygame.K_d:
-                self.direction = 'right'
+                if self.direction != 'left':
+                    self.direction = 'right'
 class Grid:
     def __init__(self) -> None:
         self.bg_color = (0,0,0)
